@@ -1,0 +1,23 @@
+{
+  "name": "functionflowx",
+  "version": "1.0.0",
+  "title": "FunctionFlowX",
+  "description": "Control how the javascript functions will be executed.",
+  "keywords": [
+    "functionflowx",
+    "functionflow",
+    "function flow",
+    "functions control",
+    "javascript functions",
+    "js functions",
+    "function control"
+  ],
+  "author": "Saša Mikodanić",
+  "license": "AGPL-3.0",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:smikodanic/functionflowx.git"
+  },
+  "dependencies": {}
+}
