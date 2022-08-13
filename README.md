@@ -6,7 +6,7 @@
 - start, stop, pause the function execution
 - no npm dependencies
 
-The FunctionFlow® controls whether functions will be executed in serial or in parallel sequence. It gives the possibility for iterative repetition of serial or parallel function sequence. It defines time delays between every function execution step. Finally, it controls the whole process to start, stop or pause.
+The FunctionFlowX® controls whether functions will be executed in serial or in parallel sequence. It gives the possibility for iterative repetition of serial or parallel function sequence. It defines time delays between every function execution step. Finally, it controls the whole process to start, stop or pause.
 There is some similarity with the async npm library but FunctionFlow is much more powerful because it uses JS Promises and async/await.
 
 
