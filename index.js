@@ -13,15 +13,18 @@ class FunctionFlow {
    * @param {EventEmitter} eventEmitter
    */
   constructor(opts = {}, eventEmitter) {
-    // general properties
+    // options
     this.debug = opts.debug; // to use debugger or not
     this.msDelay = opts.msDelay || 0; // delay after each function
 
-    // event emitter
+    // event emitter listeners
     this.eventEmitter = eventEmitter || new EventEmitter(); // use external eventEmitter to listen events 'ff-start', 'ff-pause' or 'ff-stop'
     this.eventEmitter.on('ff-start', () => { if (this.debug) { this._debugger3(this.start.name); } this.status = 'start'; });
     this.eventEmitter.on('ff-stop', () => { if (this.debug) { this._debugger3(this.stop.name); } this.status = 'stop'; });
     this.eventEmitter.on('ff-pause', () => { if (this.debug) { this._debugger3(this.pause.name); } this.status = 'pause'; });
+
+    // global variable
+    global.functionFlow = this;
 
     // function arguments - func(x, lib)
     this.x;
@@ -473,9 +476,8 @@ class FunctionFlow {
     const promis = new Promise(resolve => {
       // keep promis in 'pending' state until 'start' event come
       if (this.status === 'pause') {
-        this.eventEmitter.on('ff-start', () => {
-          resolve();
-        });
+        const cb = () => { resolve(); this.eventEmitter.off('ff-start', cb); };
+        this.eventEmitter.on('ff-start', cb);
       }
 
       // keep promis in 'pending' state until setTimeout is not finished
