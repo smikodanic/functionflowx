@@ -1,18 +1,21 @@
 const util = require('util');
 const { EventEmitter } = require('events');
+const RuntimeCommands = require('./RuntimeCommands.js');
 
 
 
 /**
  * FunctionFlow helper.
  */
-class FunctionFlow {
+class FunctionFlow extends RuntimeCommands {
 
   /**
    * @param {object} opts - options: {debug, msDelay}
    * @param {EventEmitter} eventEmitter
    */
   constructor(opts = {}, eventEmitter) {
+    super();
+
     // options
     this.debug = opts.debug; // to use debugger or not
     this.msDelay = opts.msDelay || 0; // delay after each function
@@ -41,6 +44,9 @@ class FunctionFlow {
     this.iteration = 0; // current iteration in repeat method
     this.iteration_max; // max number of iterations which can be reached by repeat() method - defined with n in repeat(n) method
     this.jumpTo; // jump to repeat() iteration
+
+    // listen for runtime commands: s,p,r,x, i, ...
+    this.listen();
   }
 
 
