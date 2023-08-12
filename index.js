@@ -44,6 +44,8 @@ class FunctionFlow extends RuntimeCommands {
     this.iteration = 0; // current iteration in repeat method
     this.iteration_max; // max number of iterations which can be reached by repeat() method - defined with n in repeat(n) method
     this.jumpTo; // jump to repeat() iteration
+    this.msPause = 365 * 24 * 60 * 60 * 1000; // maximal pause interval: (31 536 000 000 ms = 365 days)
+    this.runtimeTest = false;
 
     // listen for runtime commands: s,p,r,x, i, ...
     this.listen();
@@ -112,9 +114,9 @@ class FunctionFlow extends RuntimeCommands {
         this.goTo = undefined; // reset goTo
       }
 
-      if (this.status === 'pause') { await this._delayPause(this.msPause); }
-      if (this.status === 'stop') { break; }
-      if (this.status === 'next') { this.status = 'start'; break; }
+      if (this.status === 'pause' && !this.runtimeTest) { await this._delayPause(this.msPause); }
+      if (this.status === 'stop' && !this.runtimeTest) { break; }
+      if (this.status === 'next' && !this.runtimeTest) { this.status = 'start'; break; }
 
       const func = funcs[i];
 

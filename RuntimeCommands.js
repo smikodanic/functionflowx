@@ -49,6 +49,10 @@ class RuntimeCommands {
         console.log(':input loaded\n');
         this._loadInput(line);
 
+      } else if (/^input.*\=/.test(line)) {
+        console.log(':set input field');
+        this._setInputProperty(line);
+
 
       } else if (line === 'x') {
         console.log(':show x');
@@ -56,7 +60,7 @@ class RuntimeCommands {
 
       } else if (/^x.*\=/.test(line)) {
         console.log(':set x field');
-        this._setupXfield(line);
+        this._setXProperty(line);
 
       } else if (/^delete x.*/.test(line)) {
         console.log(':delete x field');
@@ -81,11 +85,12 @@ class RuntimeCommands {
 
 
       } else {
-        // press command s (stop) then r (resume)
-        console.log(`:serial task(s) execution\n`);
-        this.start();
+        // press command s (stop) or p (pause)
+        console.log(`:serial task(s) execution`);
+        if (this.status === 'start') { this.pause(); console.log(' The task is paused.'); }
+        this.runtimeTest = true;
         await this._exeSerial(line); // line: 'openLoginPage, login'
-        this.stop();
+        this.runtimeTest = false;
       }
 
     });
@@ -139,6 +144,18 @@ class RuntimeCommands {
 
 
   /**
+   * Show the input JSON file. Input must be injected into the ff.lib -> ff.LibAdd({input});
+   */
+  _showInput() {
+    try {
+      console.log(this.lib.input);
+    } catch (err) {
+      console.log(err.message);
+    }
+  }
+
+
+  /**
    * Reload the input JSON file. Input must be injected into the ff.lib -> ff.LibAdd({input});
    * @param {String} inputFile - myInput2.json
    */
@@ -153,12 +170,18 @@ class RuntimeCommands {
     }
   }
 
+
   /**
-   * Show the input JSON file. Input must be injected into the ff.lib -> ff.LibAdd({input});
+   * Setup "input.field" value.
+   * For example: input.messages = { id: '12345'};
    */
-  _showInput() {
+  _setInputProperty(line) {
     try {
-      console.log(this.lib.input);
+      line = 'this.lib.' + line; // this.lib.input.messages = { id: '12345'}
+      let func = new Function(line);
+      func = func.bind(this);
+      func();
+      console.log(`new input value:: ${JSON.stringify(this.lib.input, null, 2)}`);
     } catch (err) {
       console.log(err.message);
     }
@@ -182,7 +205,7 @@ class RuntimeCommands {
    * Setup "x.field" value.
    * For example: x.product.name = ' Red car ' or x.product.name = " Red car"
    */
-  _setupXfield(line) {
+  _setXProperty(line) {
     try {
       const matched = line.match(/(.*)\s*=\s*(.*)/);
 
@@ -302,7 +325,7 @@ class RuntimeCommands {
         let file_path = path.join(process.cwd(), f);
         if (!/\.js/.test(f)) { file_path += '.js'; } // add .js extension
 
-        const tf = fs.existsSync(path)(file_path); // check if file exists
+        const tf = this._checkFileExists(file_path); // check if file exists
 
         let func;
         if (tf) {
@@ -349,6 +372,21 @@ class RuntimeCommands {
       await this.one(func);
     } catch (err) {
       console.log(err.message);
+    }
+  }
+
+
+  /**
+   * Check if the file exists.
+   * @param {string} file_path - dir/file.js
+   * @returns {boolean}
+   */
+  _checkFileExists(file_path) {
+    try {
+      fs.accessSync(file_path, fs.constants.F_OK);
+      return true;
+    } catch (err) {
+      return false;
     }
   }
 
